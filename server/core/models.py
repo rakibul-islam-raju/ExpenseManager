@@ -1,5 +1,6 @@
+from unicodedata import category
 from django.db import models
-from django.contrib.auth.models import User
+from accounts.models import User
 
 
 class BaseModel(models.Model):
@@ -15,6 +16,10 @@ class BaseModel(models.Model):
 class Category(BaseModel):
     name = models.CharField(max_length=100)
 
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ["-created_at"]
+
     def __str__(self):
         return self.name
 
@@ -23,13 +28,24 @@ class Label(BaseModel):
     name = models.CharField(max_length=100)
     color_code = models.CharField(max_length=7)
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         return self.name
 
 
 class Expense(BaseModel):
-    name = (models.CharField(max_length=255),)
+    category = models.ForeignKey(
+        Category, blank=True, null=True, on_delete=models.SET_NULL
+    )
+    label = models.ForeignKey(Label, blank=True, null=True, on_delete=models.SET_NULL)
+    title = models.CharField(max_length=255)
+    amount = models.DecimalField(max_digits=8, decimal_places=2)
     description = models.TextField()
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
-        return self.name
+        return self.title
