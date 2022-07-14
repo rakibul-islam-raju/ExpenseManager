@@ -4,7 +4,12 @@ import { setCredentials, logout } from "../slices/authSlice";
 const baseQuery = fetchBaseQuery({
 	baseUrl: process.env.REACT_APP_BASE_URL,
 	credentials: "include",
+	headers: {
+		"Content-Type": "application/json",
+		"Access-Control-Allow-Origin": "*",
+	},
 	prepareHeaders: (headers, { getState }) => {
+		headers.set("Access-Control-Allow-Origin", "*");
 		const token = getState().auth.accessToken;
 		if (token) {
 			headers.set("authorization", `Bearer ${token}`);
