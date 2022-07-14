@@ -1,18 +1,34 @@
 import React from "react";
-import { List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import {
+	Link,
+	List,
+	ListItem,
+	ListItemIcon,
+	ListItemText,
+} from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
-import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import CategoryIcon from "@mui/icons-material/Category";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { NavLink } from "react-router-dom";
 
 const mainMenus = [
-	{ title: "Dashboard", path: "/", icon: <DashboardIcon /> },
-	{ title: "Expense", path: "/expense", icon: <AllInboxIcon /> },
-	{ title: "Income", path: "/income", icon: <AllInboxIcon /> },
-	{ title: "Category", path: "/category", icon: <AllInboxIcon /> },
-	{ title: "Label", path: "/label", icon: <AllInboxIcon /> },
+	{ title: "Dashboard", path: "/", icon: <DashboardIcon color="primary" /> },
+	{
+		title: "Expense",
+		path: "/expense",
+		icon: <AllInboxIcon color="primary" />,
+	},
+	{
+		title: "Income",
+		path: "/income",
+		icon: <AllInboxIcon color="primary" />,
+	},
+	{
+		title: "Category",
+		path: "/category",
+		icon: <AllInboxIcon color="primary" />,
+	},
+	{ title: "Label", path: "/label", icon: <AllInboxIcon color="primary" /> },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -28,7 +44,9 @@ const MenuList = () => {
 		<>
 			<List>
 				{mainMenus.map((menu) => (
-					<NavLink
+					<Link
+						component={NavLink}
+						underline="none"
 						className={(nav) =>
 							nav.isActive ? classes.activeItem : ""
 						}
@@ -41,7 +59,7 @@ const MenuList = () => {
 							</ListItemIcon>
 							<ListItemText primary={menu.title} />
 						</ListItem>
-					</NavLink>
+					</Link>
 				))}
 			</List>
 		</>

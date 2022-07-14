@@ -87,7 +87,7 @@ const Drawer = styled(MuiDrawer, {
 
 const DashboardLayout = () => {
 	const theme = useTheme();
-	const [open, setOpen] = React.useState(true);
+	const [open, setOpen] = React.useState(false);
 	const [anchorEl, setAnchorEl] = React.useState(null);
 
 	const handleDrawerOpen = () => {
