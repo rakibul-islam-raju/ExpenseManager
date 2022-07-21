@@ -3,13 +3,9 @@ import { setCredentials, logout } from "../slices/authSlice";
 
 const baseQuery = fetchBaseQuery({
 	baseUrl: process.env.REACT_APP_BASE_URL,
-	credentials: "include",
-	headers: {
-		"Content-Type": "application/json",
-		"Access-Control-Allow-Origin": "*",
-	},
+	// credentials: "include",
 	prepareHeaders: (headers, { getState }) => {
-		headers.set("Access-Control-Allow-Origin", "*");
+		headers.set("Content-Type", "application/json");
 		const token = getState().auth.accessToken;
 		if (token) {
 			headers.set("authorization", `Bearer ${token}`);
@@ -24,11 +20,7 @@ const baseQueryWithReauth = async (args, api, extraoptions) => {
 	if (result?.error?.originalStatus === 403) {
 		console.log("sending refresh token");
 		// send refresh token to get a new access token
-		const refreshResult = await baseQuery(
-			"/token/refresh",
-			api,
-			extraoptions
-		);
+		const refreshResult = await baseQuery("/token/refresh", api, extraoptions);
 		console.log("refreshResult =>", refreshResult);
 		if (refreshResult?.data) {
 			const user = api.getState().auth.user;

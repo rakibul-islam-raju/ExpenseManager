@@ -45,6 +45,7 @@ export default function SignInSide() {
 			console.log("userData =>", userData);
 			dispatch(setCredentials({ ...userData }));
 			setCred(initialState);
+			navigate("/");
 		} catch (err) {
 			console.log("error =>", err);
 			if (!err?.response) {
@@ -75,15 +76,7 @@ export default function SignInSide() {
 					backgroundPosition: "center",
 				}}
 			/>
-			<Grid
-				item
-				xs={12}
-				sm={8}
-				md={5}
-				component={Paper}
-				elevation={6}
-				square
-			>
+			<Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
 				<Box
 					sx={{
 						my: 8,
@@ -144,32 +137,18 @@ export default function SignInSide() {
 									<InputAdornment position="end">
 										<IconButton
 											aria-label="toggle password visibility"
-											onClick={() =>
-												setShowPass(
-													(prevState) => !prevState
-												)
-											}
-											onMouseDown={() =>
-												setShowPass(
-													(prevState) => !prevState
-												)
-											}
+											onClick={() => setShowPass((prevState) => !prevState)}
+											onMouseDown={() => setShowPass((prevState) => !prevState)}
 											edge="end"
 										>
-											{showPass ? (
-												<VisibilityOff />
-											) : (
-												<Visibility />
-											)}
+											{showPass ? <VisibilityOff /> : <Visibility />}
 										</IconButton>
 									</InputAdornment>
 								),
 							}}
 						/>
 						<FormControlLabel
-							control={
-								<Checkbox value="remember" color="primary" />
-							}
+							control={<Checkbox value="remember" color="primary" />}
 							label="Remember me"
 						/>
 						<Button
