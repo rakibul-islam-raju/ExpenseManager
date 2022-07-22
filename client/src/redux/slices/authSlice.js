@@ -36,6 +36,10 @@ const authSlice = createSlice({
 			state.user = null;
 			state.accessToken = null;
 			state.refreshToken = null;
+
+			localStorage.removeItem("expm_user");
+			localStorage.removeItem("expm_accessToken");
+			localStorage.removeItem("expm_refreshToken");
 		},
 	},
 });

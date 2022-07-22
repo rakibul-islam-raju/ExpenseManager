@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -39,6 +39,11 @@ export default function SignInSide() {
 	};
 
 	const handleSubmit = async (event) => {
+		// >>=<>=<<
+		// TODO: add hook-form vallidation
+		// ref: https://react-hook-form.com/get-started#SchemaValidation
+		// >>=<>=<<
+
 		event.preventDefault();
 		try {
 			const userData = await login(cred).unwrap();

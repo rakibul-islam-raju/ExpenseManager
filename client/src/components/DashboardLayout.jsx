@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -17,6 +17,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Outlet } from "react-router-dom";
 import MenuList from "./MenuList";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
 
 const drawerWidth = 240;
 
@@ -87,8 +89,10 @@ const Drawer = styled(MuiDrawer, {
 
 const DashboardLayout = () => {
 	const theme = useTheme();
-	const [open, setOpen] = React.useState(false);
-	const [anchorEl, setAnchorEl] = React.useState(null);
+	const dispatch = useDispatch();
+
+	const [open, setOpen] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -106,11 +110,9 @@ const DashboardLayout = () => {
 		setAnchorEl(null);
 	};
 
-	// useEffect(() => {
-	// 	if (!userInfo || !userInfo?.email) {
-	// 		navigate("/login");
-	// 	}
-	// }, [userInfo, navigate]);
+	const logoutHandler = () => {
+		dispatch(logout());
+	};
 
 	return (
 		<Box sx={{ display: "flex" }}>
@@ -129,11 +131,7 @@ const DashboardLayout = () => {
 					>
 						<MenuIcon />
 					</IconButton>
-					<Typography
-						variant="h6"
-						component="div"
-						sx={{ flexGrow: 1 }}
-					>
+					<Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
 						Expense Manager
 					</Typography>
 					<div>
@@ -163,7 +161,7 @@ const DashboardLayout = () => {
 							onClose={handleClose}
 						>
 							<MenuItem onClick={handleClose}>Profile</MenuItem>
-							<MenuItem>Logout</MenuItem>
+							<MenuItem onClick={logoutHandler}>Logout</MenuItem>
 						</Menu>
 					</div>
 				</Toolbar>
