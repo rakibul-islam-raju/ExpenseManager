@@ -1,9 +1,10 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { setCredentials, logout } from "../slices/authSlice";
 
+const refreshToken = JSON.parse(localStorage.getItem("expm_refreshToken"));
+
 const baseQuery = fetchBaseQuery({
 	baseUrl: process.env.REACT_APP_BASE_URL,
-	// credentials: "include",
 	prepareHeaders: (headers, { getState }) => {
 		headers.set("Content-Type", "application/json");
 		const token = getState().auth.accessToken;
@@ -16,11 +17,18 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReauth = async (args, api, extraoptions) => {
 	let result = await baseQuery(args, api, extraoptions);
-
-	if (result?.error?.originalStatus === 403) {
-		console.log("sending refresh token");
+	console.log("error =>>", result?.error);
+	if (result?.error?.status === 401) {
 		// send refresh token to get a new access token
-		const refreshResult = await baseQuery("/token/refresh", api, extraoptions);
+		const refreshResult = await baseQuery(
+			{
+				url: "accounts/token/refresh/",
+				method: "POST",
+				body: { refresh: refreshToken },
+			},
+			api,
+			extraoptions
+		);
 		console.log("refreshResult =>", refreshResult);
 		if (refreshResult?.data) {
 			const user = api.getState().auth.user;
@@ -48,7 +56,7 @@ const baseQueryWithReauth = async (args, api, extraoptions) => {
 	return result;
 };
 
-export const apiSlice = createApi({
+export const baseApi = createApi({
 	baseQuery: baseQueryWithReauth,
 	endpoints: (builder) => ({}),
 });

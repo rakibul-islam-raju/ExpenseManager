@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -14,54 +12,47 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import MailIcon from "@mui/icons-material/Mail";
 import LockIcon from "@mui/icons-material/Lock";
-import { IconButton, InputAdornment } from "@mui/material";
+import { Alert, IconButton, InputAdornment } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slices/authSlice";
-import { useLoginMutation } from "../../redux/slices/authApiSlice";
-
-const initialState = {
-	email: null,
-	password: null,
-};
+import { useLoginMutation } from "../../redux/api/authApi";
+import { schema } from "./schema";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 export default function SignInSide() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const [login, { isLoading }] = useLoginMutation();
 
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		mode: "onChange",
+		resolver: yupResolver(schema),
+	});
+
 	const [showPass, setShowPass] = useState(false);
 	const [errorMsg, setErrorMsg] = useState(null);
-	const [cred, setCred] = useState(initialState);
 
-	const handleChange = (e) => {
-		setCred({ ...cred, [e.target.name]: e.target.value });
-	};
-
-	const handleSubmit = async (event) => {
-		// >>=<>=<<
-		// TODO: add hook-form vallidation
-		// ref: https://react-hook-form.com/get-started#SchemaValidation
-		// >>=<>=<<
-
-		event.preventDefault();
+	const onSubmit = async (data) => {
 		try {
-			const userData = await login(cred).unwrap();
+			const userData = await login(data).unwrap();
 			console.log("userData =>", userData);
 			dispatch(setCredentials({ ...userData }));
-			setCred(initialState);
 			navigate("/");
 		} catch (err) {
 			console.log("error =>", err);
-			if (!err?.response) {
+			if (err?.data?.detail) {
+				setErrorMsg(err.data.detail);
+			} else {
 				setErrorMsg("Something went wrong!");
 			}
 		}
 	};
-
-	useEffect(() => {
-		setErrorMsg(null);
-	}, [cred]);
 
 	return (
 		<Grid container component="main" sx={{ height: "100vh" }}>
@@ -94,13 +85,16 @@ export default function SignInSide() {
 					<Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
 						<LockOutlinedIcon />
 					</Avatar>
-					<Typography component="h1" variant="h5">
+					<Typography component="h1" variant="h5" gutterBottom>
 						Sign in
 					</Typography>
+
+					{errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+
 					<Box
 						component="form"
 						noValidate
-						onSubmit={handleSubmit}
+						onSubmit={handleSubmit(onSubmit)}
 						sx={{ mt: 1 }}
 					>
 						<TextField
@@ -112,8 +106,11 @@ export default function SignInSide() {
 							label="Email Address"
 							name="email"
 							autoFocus
-							value={cred.email}
-							onChange={handleChange}
+							// value={cred.email}
+							// onChange={handleChange}
+							{...register("email")}
+							error={errors?.email?.message}
+							helperText={errors?.email?.message}
 							InputProps={{
 								startAdornment: (
 									<InputAdornment position="start">
@@ -130,8 +127,11 @@ export default function SignInSide() {
 							label="Password"
 							type={showPass ? "text" : "password"}
 							id="password"
-							value={cred.password}
-							onChange={handleChange}
+							// value={cred.password}
+							// onChange={handleChange}
+							{...register("password")}
+							error={errors?.password?.message}
+							helperText={errors?.password?.message}
 							InputProps={{
 								startAdornment: (
 									<InputAdornment position="start">
@@ -151,10 +151,6 @@ export default function SignInSide() {
 									</InputAdornment>
 								),
 							}}
-						/>
-						<FormControlLabel
-							control={<Checkbox value="remember" color="primary" />}
-							label="Remember me"
 						/>
 						<Button
 							type="submit"
