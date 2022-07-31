@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import DashboardLayout from "../components/DashboardLayout";
-import { Expense, Login } from "../pages";
+import { Dashboard, Expense, Login } from "../pages";
 import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 
@@ -25,7 +25,8 @@ const Router = () => {
 						</PrivateRoute>
 					}
 				>
-					<Route index element={<Expense />} />
+					<Route index element={<Dashboard />} />
+					<Route path="/expense" element={<Expense />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>

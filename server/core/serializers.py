@@ -16,6 +16,9 @@ class LabelSerializer(ModelSerializer):
 
 
 class ExpenseSerializer(ModelSerializer):
+    category = CategorySerializer()
+    label = LabelSerializer()
+
     class Meta:
         model = Expense
         fields = "__all__"

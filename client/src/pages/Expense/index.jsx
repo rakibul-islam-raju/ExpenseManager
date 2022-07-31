@@ -1,13 +1,17 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import { Button, Card, CardContent, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CustomDataTable from "../../components/CustomDataTable";
+import CustomModal from "../../components/CustomModal";
+import useModal from "../../hooks/useModal";
 import { useGetExpenseListMutation } from "../../redux/api/expenseApi";
 import {
 	selectAllExpenses,
 	setExpenses,
 } from "../../redux/slices/expenseSlice";
+import CreateExpenseForm from "./components/CreateExpenseForm";
+import CustomChip from "../../components/CustomChip";
 
 const columns = [
 	{ field: "id", headerName: "ID" },
@@ -41,11 +45,20 @@ const columns = [
 		field: "label",
 		headerName: "Label",
 		width: 100,
+		renderCell: (params) => {
+			return (
+				<CustomChip
+					title={params.value.title}
+					color={"#" + params.value.color_code}
+				/>
+			);
+		},
 	},
 ];
 
 const Expense = () => {
 	const dispatch = useDispatch();
+	const [open, openModal, closeModal] = useModal();
 
 	const [getExpenseList, { isLoading }] = useGetExpenseListMutation();
 
@@ -57,11 +70,14 @@ const Expense = () => {
 		return {
 			id: item?.id,
 			title: item?.title,
-			category: item?.category,
+			category: item?.category?.name,
 			description: item?.description,
 			amount: item?.amount,
 			created_at: new Date(item?.created_at).toLocaleDateString(),
-			label: item?.label,
+			label: {
+				title: item?.label?.name,
+				color_code: item?.label?.color_code,
+			},
 		};
 	});
 
@@ -82,14 +98,25 @@ const Expense = () => {
 		fetchExpenses();
 	}, [getExpenseList, dispatch]);
 
-	console.log("expenses =>", expenses);
-
 	return (
 		<Card variant="outlined">
 			<CardContent>
-				<Typography variant="h4" gutterBottom>
-					All Expenses
-				</Typography>
+				<Box display="flex" justifyContent="space-between" alignItems="center">
+					<Typography variant="h4">All Expenses</Typography>
+					<Box>
+						<Button onClick={openModal} variant="outlined">
+							New Expense
+						</Button>
+						{openModal && (
+							<CustomModal
+								open={open}
+								closeModal={closeModal}
+								title="New Expense"
+								bodyComponent={<CreateExpenseForm />}
+							/>
+						)}
+					</Box>
+				</Box>
 				<Box mt={5}>
 					<CustomDataTable
 						cols={columns}
