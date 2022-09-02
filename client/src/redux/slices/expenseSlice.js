@@ -2,11 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const expenseSlice = createSlice({
 	name: "expense",
-	initialState: { expenses: [] },
+	initialState: { expenses: [], count: 0, next: null, previous: null },
 	reducers: {
-		setExpenses: (state, action) => {
-			const { results } = action.payload;
+		setExpenses: (state, { payload }) => {
+			const { results, count, next, previous } = payload;
 			state.expenses = results;
+			state.count = count;
+			state.next = next;
+			state.previous = previous;
 		},
 	},
 });

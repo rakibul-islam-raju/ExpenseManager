@@ -1,4 +1,10 @@
-import { Button, Card, CardContent, Typography } from "@mui/material";
+import {
+	Button,
+	Card,
+	CardContent,
+	CircularProgress,
+	Typography,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +18,9 @@ import {
 } from "../../redux/slices/expenseSlice";
 import CreateExpenseForm from "./components/CreateExpenseForm";
 import CustomChip from "../../components/CustomChip";
+import { useGetLabelListMutation } from "../../redux/api/labelApi";
+import { setLabels } from "../../redux/slices/labelSlice";
+import CustomAlert from "../../components/CustomAlert";
 
 const columns = [
 	{ field: "id", headerName: "ID" },
@@ -60,11 +69,19 @@ const Expense = () => {
 	const dispatch = useDispatch();
 	const [open, openModal, closeModal] = useModal();
 
-	const [getExpenseList, { isLoading }] = useGetExpenseListMutation();
+	const [getExpenseList, { isLoading: expenseLoading, error: expenseError }] =
+		useGetExpenseListMutation();
+	const [getLabelList, { isLoading: labelLoading, error: labelError }] =
+		useGetLabelListMutation();
 
 	const expenses = useSelector(selectAllExpenses);
 
 	const [errorMsg, setErrorMsg] = useState(null);
+	const [selectedIds, setSelectedIds] = useState(null);
+
+	const getSelectedIds = (ids) => {
+		setSelectedIds(ids);
+	};
 
 	const rows = expenses?.map((item) => {
 		return {
@@ -83,26 +100,24 @@ const Expense = () => {
 
 	useEffect(() => {
 		const fetchExpenses = async () => {
-			try {
-				const result = await getExpenseList();
-				dispatch(setExpenses(result.data));
-			} catch (err) {
-				console.log("error =>", err);
-				if (err?.data?.detail) {
-					setErrorMsg(err.data.detail);
-				} else {
-					setErrorMsg("Something went wrong!");
-				}
-			}
+			const result = await getExpenseList();
+			dispatch(setExpenses(result.data));
 		};
 		fetchExpenses();
-	}, [getExpenseList, dispatch]);
+
+		const fetchLabels = async () => {
+			const result = await getLabelList();
+			dispatch(setLabels(result.data));
+		};
+		fetchLabels();
+	}, []);
 
 	return (
 		<Card variant="outlined">
 			<CardContent>
 				<Box display="flex" justifyContent="space-between" alignItems="center">
 					<Typography variant="h4">All Expenses</Typography>
+
 					<Box>
 						<Button onClick={openModal} variant="outlined">
 							New Expense
@@ -117,12 +132,25 @@ const Expense = () => {
 						)}
 					</Box>
 				</Box>
+
+				{expenseLoading || labelLoading ? (
+					<CircularProgress />
+				) : (
+					(expenseError || labelError) && (
+						<CustomAlert
+							severity="error"
+							errorMsg={expenseError || labelError}
+						/>
+					)
+				)}
+
 				<Box mt={5}>
 					<CustomDataTable
 						cols={columns}
 						rows={rows}
 						pageSize={20}
 						rowsPerPageOptions={[20]}
+						getSelectedIds={getSelectedIds}
 					/>
 				</Box>
 			</CardContent>

@@ -12,7 +12,12 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import MailIcon from "@mui/icons-material/Mail";
 import LockIcon from "@mui/icons-material/Lock";
-import { Alert, IconButton, InputAdornment } from "@mui/material";
+import {
+	Alert,
+	CircularProgress,
+	IconButton,
+	InputAdornment,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../redux/slices/authSlice";
@@ -20,11 +25,12 @@ import { useLoginMutation } from "../../redux/api/authApi";
 import { schema } from "./schema";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import CustomAlert from "../../components/CustomAlert";
 
 export default function SignInSide() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-	const [login, { isLoading }] = useLoginMutation();
+	const [login, { isLoading, error: authError }] = useLoginMutation();
 
 	const {
 		register,
@@ -36,22 +42,11 @@ export default function SignInSide() {
 	});
 
 	const [showPass, setShowPass] = useState(false);
-	const [errorMsg, setErrorMsg] = useState(null);
 
 	const onSubmit = async (data) => {
-		try {
-			const userData = await login(data).unwrap();
-			console.log("userData =>", userData);
-			dispatch(setCredentials({ ...userData }));
-			navigate("/");
-		} catch (err) {
-			console.log("error =>", err);
-			if (err?.data?.detail) {
-				setErrorMsg(err.data.detail);
-			} else {
-				setErrorMsg("Something went wrong!");
-			}
-		}
+		const userData = await login(data).unwrap();
+		dispatch(setCredentials({ ...userData }));
+		navigate("/");
 	};
 
 	return (
@@ -89,7 +84,11 @@ export default function SignInSide() {
 						Sign in
 					</Typography>
 
-					{errorMsg && <Alert severity="error">{errorMsg}</Alert>}
+					{isLoading ? (
+						<CircularProgress />
+					) : (
+						authError && <CustomAlert severity="error" errorMsg={authError} />
+					)}
 
 					<Box
 						component="form"
@@ -157,6 +156,7 @@ export default function SignInSide() {
 							fullWidth
 							variant="contained"
 							sx={{ mt: 3, mb: 2 }}
+							disabled={isLoading}
 						>
 							Sign In
 						</Button>

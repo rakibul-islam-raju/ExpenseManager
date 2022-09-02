@@ -8,7 +8,15 @@ export const expenseApi = baseApi.injectEndpoints({
 				method: "GET",
 			}),
 		}),
+		createExpense: builder.mutation({
+			query: (data) => ({
+				url: "expenses",
+				method: "POST",
+				body: { ...data },
+			}),
+		}),
 	}),
 });
 
-export const { useGetExpenseListMutation } = expenseApi;
+export const { useGetExpenseListMutation, useCreateExpenseMutation } =
+	expenseApi;

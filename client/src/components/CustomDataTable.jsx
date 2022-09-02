@@ -2,13 +2,13 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 
-const CustomDataTable = ({ cols, rows, pageSize, rowsPerPageOptions }) => {
-	const [selectedIds, setSelectedIds] = React.useState(null);
-
-	const getSelectedIds = (ids) => {
-		setSelectedIds(ids);
-	};
-
+const CustomDataTable = ({
+	cols,
+	rows,
+	pageSize,
+	rowsPerPageOptions,
+	getSelectedIds,
+}) => {
 	return (
 		<Box sx={{ width: "100%" }}>
 			<DataGrid
